@@ -6,7 +6,7 @@ authors = ["Peng Chen <chenpengcnbj@gmail.com>"]
 license = "MIT"
 package-mode = true
 
-packages = [{ include = "common" }]
+packages = [{ include = "common", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
