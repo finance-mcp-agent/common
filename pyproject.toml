@@ -3,7 +3,7 @@ name = "common"
 version = "0.1.0"
 description = "Shared utilities for MCP services"
 authors = ["Peng Chen <chenpengcnbj@gmail.com>"]
-package-mode = false
+packages = [{ include = "common" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
