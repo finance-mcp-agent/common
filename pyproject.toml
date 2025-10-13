@@ -3,6 +3,9 @@ name = "common"
 version = "0.1.0"
 description = "Shared utilities for MCP services"
 authors = ["Peng Chen <chenpengcnbj@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
 packages = [{ include = "common" }]
 
 [tool.poetry.dependencies]
