@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Shared utilities for MCP services"
 authors = ["Peng Chen <chenpengcnbj@gmail.com>"]
 license = "MIT"
+package-mode = true
 
 packages = [{ include = "common" }]
 
