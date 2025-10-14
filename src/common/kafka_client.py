@@ -19,7 +19,7 @@ class KafkaBase:
 
     def _load_scram(self):
         sm = boto3.client("secretsmanager", region_name=self.region)
-        sec = sm.get_secret_value(SecretId="/trader/dev/kafka_scram")["SecretString"]
+        sec = sm.get_secret_value(SecretId="AmazonMSK_trader_dev_kafka_scram")["SecretString"]
         creds = json.loads(sec)
         return creds["username"], creds["password"]
 
