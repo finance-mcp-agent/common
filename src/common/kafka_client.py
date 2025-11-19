@@ -15,7 +15,7 @@ class KafkaBase:
         self.region = os.getenv("AWS_REGION", "us-east-1")
         self.bootstrap = os.getenv("KAFKA_BOOTSTRAP", "")
         # Mode detection: explicit KAFKA_MODE wins; otherwise infer from bootstrap
-        self.mode = os.getenv("KAFKA_MODE", "").lower()
+        self.mode = os.getenv("KAFKA_MODE", "local").lower()
         if not self.mode:
             if self.bootstrap and ("localhost" in self.bootstrap or "127.0.0.1" in self.bootstrap):
                 self.mode = "local"
