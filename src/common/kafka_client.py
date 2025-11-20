@@ -113,6 +113,7 @@ class KafkaConsumerClient(KafkaBase):
             "auto.offset.reset": os.getenv("KAFKA_AUTO_OFFSET_RESET", "earliest"),
             "enable.auto.commit": os.getenv("KAFKA_ENABLE_AUTO_COMMIT", "false").lower() == "true"
         })
+        self._cfg = cfg
         self.consumer = Consumer(cfg)
         self.stop_flag = threading.Event()
         self.thread = None
@@ -135,7 +136,7 @@ class KafkaConsumerClient(KafkaBase):
                 payload = json.loads(msg.value().decode())
                 self.handler(payload)
                 # Only commit if auto-commit is disabled
-                if not self.consumer.config().get("enable.auto.commit", False):
+                if not self._cfg.get("enable.auto.commit", False):
                     self.consumer.commit(msg, asynchronous=False)
             except Exception as e:
                 try:
