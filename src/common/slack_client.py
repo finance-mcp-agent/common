@@ -43,6 +43,7 @@ class SlackClient:
         channel: Optional[str],
         decision: Dict[str, Any],
         callback_base_url: str,
+        hmac_key: Optional[str] = None,
     ) -> None:
         """
         Send a Block Kit message for an impact-model proposed_decision.
@@ -59,26 +60,43 @@ class SlackClient:
         if not channel_id:
             raise ValueError("Slack channel not provided and no default_channel set")
 
-        ticker = decision.get("ticker")
-        direction = decision.get("direction")
-        confidence = decision.get("confidence")
-        sentiment = decision.get("sentiment")
-        decision_id = decision.get("decision_id")
-        signal_id = decision.get("signal_id")
+        decision_id = decision["decision_id"]
+        signal_id = decision["signal_id"]
+        ticker = decision["ticker"]
+        direction = decision["direction"]
+        confidence = float(decision["confidence"])
+        sentiment = decision.get("sentiment", "neutral")
 
         title = f"{ticker} — {direction} (conf={confidence:.2f})"
         subtitle = f"Sentiment={sentiment}, signal_id={signal_id}"
 
-        # Value stored in each button so we can reconstruct which decision was clicked
+        # Payload that we will protect with internal HMAC
+        payload_for_sig = {
+            "decision_id": decision_id,
+            "signal_id": signal_id,
+            "ticker": ticker,
+            "direction": direction,
+            "confidence": confidence,
+            "sentiment": sentiment,
+        }
+
+        raw = json.dumps(payload_for_sig, sort_keys=True)
+        sig = ""
+        if hmac_key:
+            sig = hmac.new(
+                hmac_key.encode("utf-8"),
+                raw.encode("utf-8"),
+                hashlib.sha256,
+            ).hexdigest()
+
+        # This is what goes into the Slack button .value
         value_payload = json.dumps(
             {
-                "decision_id": decision_id,
-                "signal_id": signal_id,
-                "ticker": ticker,
+                **payload_for_sig,
+                "sig": sig,
             }
         )
 
-        # This callback_id helps route inside /slack/actions
         callback_id = "trade_approval"
 
         blocks = [
@@ -125,7 +143,7 @@ class SlackClient:
 
         payload = {
             "channel": channel_id,
-            "text": title,  # fallback
+            "text": title,
             "blocks": blocks,
         }
 
